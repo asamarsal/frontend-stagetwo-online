@@ -9,16 +9,15 @@ import { AuthProvider } from "./context/AuthProvider";
 import PrivateRoute from "./lib/PrivateRoute";
 import ThemeToggle from "./lib/ThemeToggle";
 import Cart from "./pages/Cart";
-import { LucideBookmark, LucideShoppingCart } from "lucide-react";
+import { LucideBookmark, LucidePlus, LucideShoppingCart } from "lucide-react";
 import { Toaster } from "sonner";
 
 import About from "./pages/About";
-import Productstaskthree from "./pages/Productstaskthree";
 import Posts from "./pages/Posts";
 import Postdetail from "./pages/Postdetail";
 import ProductDetail from "./pages/Productdetail";
+import AddProduct from "./pages/AddProduct";
 import Register from "./pages/Register";
-import LoginAdmin from "./pages/LoginAdmin";
 import RegisterAdmin from "./pages/RegisterAdmin";
 import { useEffect, useState } from "react";
 
@@ -33,7 +32,7 @@ function Header() {
 
       const authToken = localStorage.getItem('authToken');
       
-      fetch('http://localhost:3000/auth/me', {
+      fetch('/auth/me', {
         headers: {
           'Authorization': `Bearer ${authToken}`
         }
@@ -41,12 +40,30 @@ function Header() {
       .then(res => res.json())
       .then(data => {
         setUser(data.user);
+        console.log("Role user:", data.user?.role);
       })
       .catch(err => {
         console.error('Failed to fetch user:', err);
       });
-    }
-  }, [token]);
+    
+    // Cek supplier
+    fetch('/auth/suppliers/me', {
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.supplier) {
+        setUser(data.supplier);
+        console.log("Role supplier:", data.supplier?.role);
+      }
+    })
+    .catch(err => {
+      console.error('Failed to fetch supplier:', err);
+    });
+  }
+}, [token]);
 
   return (
     <div className="w-full flex flex-col sm:flex-row items-center justify-between p-2 sm:p-4 border-b bg-white dark:bg-purple-900 gap-2 sm:gap-0">
@@ -81,20 +98,29 @@ function Header() {
           )}
         </div>
 
-        {token && (
+        {token && user?.role === 'user' && (
           <Button asChild variant="outline">
             <Link to="/bookmarks">
             <LucideBookmark /></Link>
           </Button>
         )}
 
-        {token && (
+        {token && user?.role === 'user' &&(
           <Button asChild variant="outline">
             <Link to="/cart">
             <LucideShoppingCart />
             </Link>
           </Button>
         )}
+
+        {token && user?.role === 'superuser' && (
+          <Button asChild variant="outline">
+            <Link to="/addproduct">
+              <LucidePlus />
+            </Link>
+          </Button>
+        )}
+
         <ThemeToggle />
         {token ? (
           <Button onClick={logout} className="bg-red-500 text-white hover:bg-red-600">
@@ -118,13 +144,11 @@ function App() {
           <Route path="/" element={<Home />} />
       
           <Route path="/login" element={<Login />} />
-          <Route path="/loginadmin" element={<LoginAdmin />} />
           <Route path="/register" element={<Register />} />
           <Route path="/registeradmin" element={<RegisterAdmin />} />
 
           <Route path="/about" element={<About />} />
           
-          <Route path="/productstaskthree" element={<Productstaskthree />} />
           <Route path="/posts" element={<Posts />}>
             <Route path=":postId" element={<Postdetail />} />
           </Route>
@@ -136,6 +160,12 @@ function App() {
           <Route path="/cart" element={
             <PrivateRoute>
               <Cart />
+            </PrivateRoute>}>
+          </Route>
+
+          <Route path="/addproduct" element={
+            <PrivateRoute>
+              <AddProduct />
             </PrivateRoute>}>
           </Route>
 

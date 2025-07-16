@@ -14,7 +14,6 @@ import{ useEffect, useState } from "react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 
 export default function Cart() {
-
   const [cart, setCart] = useState<any[]>([]);
 
   useEffect(() => {
@@ -22,64 +21,58 @@ export default function Cart() {
     setCart(storedCart);
   }, []);
 
+  const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+
   return (
     <div className="flex flex-col items-center mt-6 min-h-svh select-none">
-        <Card className="w-full max-w-[400px]">
+        <Card className="w-full max-w-[600px]">
           <CardHeader>
             <CardTitle className="text-xl text-center">Cart</CardTitle>
+            {cart.length > 0 && (
+              <CardDescription className="text-center text-green-500">
+                Semuanya: ${total.toLocaleString()}
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent className="flex justify-center gap-2">
-            <ul className="px-6 pb-2">
+            <ul className="w-full px-6 pb-2 space-y-4">
               {cart.length === 0 ? (
                 <li>Cart kosong</li>
               ) : (
                 cart.map((item) => (
-                  <li key={item.id} className="mb-2 flex items-center">
-                    <img src={item.image} alt={item.title} className="w-30 h-30 m-2" />
-                    {item.title}
+                  <li key={item.id} className="flex items-center justify-between border-b pb-2">
+                    <div className="flex items-center gap-4">
+                      <img 
+                        src={item.photo} 
+                        alt={item.name} 
+                        className="w-20 h-20 object-contain rounded" 
+                      />
+                      <div>
+                        <h3 className="font-medium">{item.name}</h3>
+                        <p className="text-sm text-green-500">
+                          ${item.price.toLocaleString()} x {item.quantity || 1}
+                        </p>
+                        <p className="text-sm font-medium text-green-600">
+                          Total: ${((item.quantity || 1) * item.price).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => {
+                        const newCart = cart.filter(cartItem => cartItem.id !== item.id);
+                        localStorage.setItem("cart", JSON.stringify(newCart));
+                        setCart(newCart);
+                      }}
+                    >
+                      <LucideTrash className="h-4 w-4" />
+                    </Button>
                   </li>
                 ))
               )}
             </ul>
-          </CardContent>
-          <CardContent className="flex justify-center gap-2">
-              <Link to="/">
-                  <Button className="bg-blue-500">
-                    <LucideHome/>Home</Button>
-              </Link>
-              
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <Button className="bg-yellow-500"><LucideTrash />Hapus</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="bg-transparent shadow-none border-none p-0">
-                    <Card className="rounded-xl">
-                        <CardHeader>
-                          <CardTitle>Hapus semua yang ada di cart?</CardTitle>
-                          <CardDescription>Tindakan ini tidak dapat dibatalkan</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex justify-end space-x-2">
-                          <AlertDialogCancel asChild>
-                            <Button variant="outline">Batal</Button>
-                          </AlertDialogCancel>
-                          <AlertDialogAction asChild>
-                              <Button className="bg-green-500"  onClick={() => {
-                                localStorage.removeItem("cart");
-                                setCart([]);}
-                                }>
-                                  Hapus
-                              </Button>
-                          </AlertDialogAction>
-                        </CardContent>
-                    </Card>
-                </AlertDialogContent>
-              </AlertDialog>
-
-              <Link to="/products">
-                  <Button variant="destructive">
-                    <Loader2Icon className="animate-bounce" />Products
-                  </Button>
-              </Link>
           </CardContent>
       </Card>
     </div>

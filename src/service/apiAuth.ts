@@ -21,9 +21,27 @@ export const authLoginService = {
   },
 };
 
+export const authLoginAdminService = {
+  login: async (credentials: LoginRequest): Promise<LoginResponse> => {
+    const response = await apiAuth.post("/auth/suppliers/login", credentials);
+    return response.data;
+  },
+};
+
 export const authRegisterService = {
   register: async (formData: FormData): Promise<RegisterResponse> => {
     const response = await apiAuthRegister.post("/auth/register", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  },
+};
+
+export const authRegisterAdminService = {
+  register: async (formData: FormData): Promise<RegisterResponse> => {
+    const response = await apiAuthRegister.post("/auth/suppliers/register", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

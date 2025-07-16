@@ -102,13 +102,6 @@ export default function inLogin() {
 
         <div>
           <h1 className="text-sm text-center mt-4">
-            Login Sebagai Admin?{" "}
-            <Link to="/loginadmin" className="text-blue-600 hover:underline">Click</Link>
-          </h1>
-        </div>
-
-        <div>
-          <h1 className="text-sm text-center mt-4">
             Belum punya akun?{" "}
             <Link to="/register" className="text-green-600 hover:underline">Register</Link>
           </h1>
