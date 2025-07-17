@@ -157,7 +157,7 @@ export default function Products() {
                               }
                             }}
                           >
-                            Delete
+                            Soft Delete
                           </Button>
                         )}
                     </CardHeader>

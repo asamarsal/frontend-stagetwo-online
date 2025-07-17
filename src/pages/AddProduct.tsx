@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { api } from "@/service/api";
+import { addProduct, api } from "@/service/api";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -62,13 +62,7 @@ export default function AddProduct() {
       }
       formData.append('detail', data.detail);
 
-      const response = await fetch('http://localhost:3000/auth/products/add', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
+      const response = await addProduct(formData, token ?? "");
 
       if (response.ok) {
         toast.success('Product added successfully');
@@ -79,7 +73,7 @@ export default function AddProduct() {
       }
     } catch (error) {
       console.error('Error adding product:', error);
-      toast.error('Failed to add product');
+      toast.error('Failed adding product');
     } finally {
       setLoading(false);
     }
